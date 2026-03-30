@@ -1,0 +1,5 @@
+*.tar.gz
+*.ipk
+*.apk
+.DS_Store
+Thumbs.db
