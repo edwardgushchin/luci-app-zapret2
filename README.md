@@ -24,12 +24,19 @@ The panel displays:
 - current `/opt/zapret2/config`.
 
 It also provides basic control buttons:
-- Enable
-- Disable
-- Start
-- Restart
-- Stop
+- Enable / Disable autorun
+- Start / Restart / Stop
 - Refresh
+- Copy current command / rules / config sections
+
+## Localization
+
+The panel is runtime-localized and currently supports:
+- **English** — default/base language
+- **Russian** — automatically selected when the current LuCI / browser locale starts with `ru`
+
+There is no manual language switch in the panel itself.
+The UI language is chosen automatically from the current LuCI page language (with browser locale as fallback).
 
 ## Important scope
 

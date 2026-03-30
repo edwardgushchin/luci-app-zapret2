@@ -5,6 +5,33 @@
 'require poll';
 'require ui';
 
+function detectLocale() {
+	var htmlLang = '';
+	var luciLang = '';
+	var browserLang = '';
+
+	try {
+		htmlLang = document && document.documentElement ? (document.documentElement.getAttribute('lang') || '') : '';
+	} catch (e) {}
+
+	try {
+		luciLang = window.L && L.env ? (L.env.lang || L.env.i18nLanguage || '') : '';
+	} catch (e2) {}
+
+	try {
+		browserLang = (navigator.language || (navigator.languages && navigator.languages[0]) || '');
+	} catch (e3) {}
+
+	return String(htmlLang || luciLang || browserLang || 'en').toLowerCase();
+}
+
+var CURRENT_LOCALE = detectLocale();
+var USE_RUSSIAN = /^ru([_-]|$)/.test(CURRENT_LOCALE);
+
+function tr(en, ru) {
+	return USE_RUSSIAN ? ru : en;
+}
+
 if (!window.__zapret2PanelStylesInjected) {
 	window.__zapret2PanelStylesInjected = true;
 	document.head.append(E('style', { 'type': 'text/css' }, `
@@ -172,15 +199,15 @@ function prettifyCommand(command) {
 function copyText(text, label) {
 	var value = trimText(text);
 	if (!value) {
-		ui.addNotification(null, E('p', _('Нечего копировать.')));
+		ui.addNotification(null, E('p', tr('Nothing to copy.', 'Нечего копировать.')));
 		return Promise.resolve();
 	}
 
 	if (navigator.clipboard && navigator.clipboard.writeText) {
 		return navigator.clipboard.writeText(value).then(function() {
-			ui.addNotification(null, E('p', _('Скопировано: %s').format(label)));
+			ui.addNotification(null, E('p', tr('Copied: %s', 'Скопировано: %s').format(label)));
 		}).catch(function(err) {
-			ui.addNotification(null, E('p', _('Не удалось скопировать %s: %s').format(label, err.message || err)));
+			ui.addNotification(null, E('p', tr('Failed to copy %s: %s', 'Не удалось скопировать %s: %s').format(label, err.message || err)));
 		});
 	}
 
@@ -191,9 +218,9 @@ function copyText(text, label) {
 		temp.select();
 		document.execCommand('copy');
 		temp.remove();
-		ui.addNotification(null, E('p', _('Скопировано: %s').format(label)));
+		ui.addNotification(null, E('p', tr('Copied: %s', 'Скопировано: %s').format(label)));
 	} catch (err2) {
-		ui.addNotification(null, E('p', _('Не удалось скопировать %s: %s').format(label, err2.message || err2)));
+		ui.addNotification(null, E('p', tr('Failed to copy %s: %s', 'Не удалось скопировать %s: %s').format(label, err2.message || err2)));
 	}
 
 	return Promise.resolve();
@@ -219,12 +246,12 @@ function getServiceInfo(serviceData) {
 
 function getStateInfo(enabled, serviceInfo) {
 	if (serviceInfo.running) {
-		return { label: _('Работает'), className: 'z2-running' };
+		return { label: tr('Running', 'Работает'), className: 'z2-running' };
 	}
 	if (!enabled) {
-		return { label: _('Выключен'), className: 'z2-disabled' };
+		return { label: tr('Disabled', 'Выключен'), className: 'z2-disabled' };
 	}
-	return { label: _('Остановлен'), className: 'z2-stopped' };
+	return { label: tr('Stopped', 'Остановлен'), className: 'z2-stopped' };
 }
 
 function makeMetaCard(label, valueNode) {
@@ -247,7 +274,7 @@ function makeTextSection(title, subtitle, textareaNode, copyLabel, self) {
 					'click': ui.createHandlerFn(self, function() {
 						return copyText(textareaNode.value, copyLabel);
 					})
-				}, _('Копировать'))
+				}, tr('Copy', 'Копировать'))
 			])
 		]),
 		E('div', { 'class': 'cbi-section-node' }, [ textareaNode ])
@@ -276,12 +303,12 @@ return view.extend({
 
 		return callInitAction('zapret2', action).then(function(success) {
 			if (!success)
-				throw new Error(_('Command failed'));
+				throw new Error('Command failed');
 
-			ui.addNotification(null, E('p', _('Команда выполнена: %s').format(action)));
+			ui.addNotification(null, E('p', tr('Action executed: %s', 'Команда выполнена: %s').format(action)));
 			return self.updateStatus();
 		}).catch(function(err) {
-			ui.addNotification(null, E('p', _('Не удалось выполнить действие "%s": %s').format(action, err.message || err)));
+			ui.addNotification(null, E('p', tr('Unable to execute action "%s": %s', 'Не удалось выполнить действие "%s": %s').format(action, err.message || err)));
 		});
 	},
 
@@ -302,12 +329,12 @@ return view.extend({
 		var enabled = !!(initList.zapret2 && initList.zapret2.enabled);
 		var info = getServiceInfo(serviceList);
 		var state = getStateInfo(enabled, info);
-		var versionText = trimText(versionRes.stdout || versionRes.stderr || _('Неизвестно'));
-		var rulesText = trimText(listTable.stdout || listTable.stderr || _('Нет вывода queue rules'));
+		var versionText = trimText(versionRes.stdout || versionRes.stderr || tr('Unknown', 'Неизвестно'));
+		var rulesText = trimText(listTable.stdout || listTable.stderr || tr('No queue rules output', 'Нет вывода queue rules'));
 
 		this.statusBadge.textContent = state.label;
 		this.statusBadge.className = 'z2-badge ' + state.className;
-		this.autorunValue.textContent = enabled ? _('Включён') : _('Выключен');
+		this.autorunValue.textContent = enabled ? tr('Enabled', 'Включён') : tr('Disabled', 'Выключен');
 		this.instancesValue.textContent = info.totalCount ? String(info.runningCount) + ' / ' + String(info.totalCount) : '0';
 		this.pidsValue.textContent = info.pids.length ? info.pids.join(', ') : '—';
 		this.versionValue.textContent = versionText;
@@ -326,7 +353,7 @@ return view.extend({
 	render: function(data) {
 		var self = this;
 
-		this.statusBadge = E('span', { 'class': 'z2-badge z2-stopped' }, _('Загрузка...'));
+		this.statusBadge = E('span', { 'class': 'z2-badge z2-stopped' }, tr('Loading...', 'Загрузка...'));
 		this.autorunValue = E('span', '—');
 		this.instancesValue = E('span', '—');
 		this.pidsValue = E('span', '—');
@@ -352,27 +379,27 @@ return view.extend({
 		this.btnEnable = E('button', {
 			'class': 'btn cbi-button-save important',
 			'click': ui.createHandlerFn(this, function(ev) { return self.handleServiceAction('enable', ev); })
-		}, _('Включить автозапуск'));
+		}, tr('Enable autorun', 'Включить автозапуск'));
 		this.btnDisable = E('button', {
 			'class': 'btn cbi-button-negative important',
 			'click': ui.createHandlerFn(this, function(ev) { return self.handleServiceAction('disable', ev); })
-		}, _('Выключить автозапуск'));
+		}, tr('Disable autorun', 'Выключить автозапуск'));
 		this.btnStart = E('button', {
 			'class': 'btn cbi-button-action',
 			'click': ui.createHandlerFn(this, function(ev) { return self.handleServiceAction('start', ev); })
-		}, _('Запустить'));
+		}, tr('Start', 'Запустить'));
 		this.btnRestart = E('button', {
 			'class': 'btn cbi-button-action',
 			'click': ui.createHandlerFn(this, function(ev) { return self.handleServiceAction('restart', ev); })
-		}, _('Перезапустить'));
+		}, tr('Restart', 'Перезапустить'));
 		this.btnStop = E('button', {
 			'class': 'btn cbi-button-negative',
 			'click': ui.createHandlerFn(this, function(ev) { return self.handleServiceAction('stop', ev); })
-		}, _('Остановить'));
+		}, tr('Stop', 'Остановить'));
 		this.btnRefresh = E('button', {
 			'class': 'btn',
 			'click': ui.createHandlerFn(this, function() { return self.updateStatus(); })
-		}, _('Обновить'));
+		}, tr('Refresh', 'Обновить'));
 
 		poll.add(function() {
 			return self.updateStatus();
@@ -383,8 +410,11 @@ return view.extend({
 				E('div', { 'class': 'cbi-section-node' }, [
 					E('div', { 'class': 'z2-status-strip' }, [
 						E('div', {}, [
-							E('h2', { 'style': 'margin:0 0 6px 0;' }, _('Zapret2')),
-							E('div', { 'class': 'z2-muted' }, _('Мини-панель для вручную установленного zapret2 на Flint 2.'))
+							E('h2', { 'style': 'margin:0 0 6px 0;' }, 'Zapret2'),
+							E('div', { 'class': 'z2-muted' }, tr(
+								'Minimal panel for a manually installed zapret2 on Flint 2.',
+								'Мини-панель для вручную установленного zapret2 на Flint 2.'
+							))
 						]),
 						this.statusBadge
 					])
@@ -392,16 +422,16 @@ return view.extend({
 			]),
 
 			E('div', { 'class': 'z2-grid' }, [
-				makeMetaCard(_('Автозапуск'), this.autorunValue),
-				makeMetaCard(_('Инстансы'), this.instancesValue),
-				makeMetaCard(_('PID'), this.pidsValue),
-				makeMetaCard(_('Версия nfqws2'), this.versionValue),
-				makeMetaCard(_('Профили в команде'), this.profileCountValue)
+				makeMetaCard(tr('Autorun', 'Автозапуск'), this.autorunValue),
+				makeMetaCard(tr('Instances', 'Инстансы'), this.instancesValue),
+				makeMetaCard('PID', this.pidsValue),
+				makeMetaCard(tr('nfqws2 version', 'Версия nfqws2'), this.versionValue),
+				makeMetaCard(tr('Profiles in command', 'Профили в команде'), this.profileCountValue)
 			]),
 
 			E('div', { 'class': 'cbi-section' }, [
 				E('div', { 'class': 'z2-section-header' }, [
-					E('div', { 'class': 'z2-section-title' }, _('Управление сервисом')),
+					E('div', { 'class': 'z2-section-title' }, tr('Service control', 'Управление сервисом')),
 					E('div', { 'class': 'z2-section-tools' }, [ this.btnRefresh ])
 				]),
 				E('div', { 'class': 'cbi-section-node z2-actions' }, [
@@ -411,12 +441,33 @@ return view.extend({
 					this.btnRestart,
 					this.btnStop
 				]),
-				E('div', { 'class': 'z2-note' }, _('Страница обновляется автоматически раз в 5 секунд.'))
+				E('div', { 'class': 'z2-note' }, tr(
+					'The page refreshes automatically every 5 seconds.',
+					'Страница обновляется автоматически раз в 5 секунд.'
+				))
 			]),
 
-			makeTextSection(_('Активная команда nfqws2'), _('Текущая живая командная строка процесса.'), this.commandArea, _('командная строка nfqws2'), this),
-			makeTextSection(_('Текущие queue rules'), _('Вывод /etc/init.d/zapret2 list_table.'), this.rulesArea, _('queue rules'), this),
-			makeTextSection(_('Текущий /opt/zapret2/config'), _('Основной runtime-конфиг zapret2 на роутере.'), this.configArea, _('config zapret2'), this)
+			makeTextSection(
+				tr('Active nfqws2 command', 'Активная команда nfqws2'),
+				tr('Current live command line of the running process.', 'Текущая живая командная строка процесса.'),
+				this.commandArea,
+				tr('nfqws2 command line', 'командная строка nfqws2'),
+				this
+			),
+			makeTextSection(
+				tr('Current queue rules', 'Текущие queue rules'),
+				tr('Output of /etc/init.d/zapret2 list_table.', 'Вывод /etc/init.d/zapret2 list_table.'),
+				this.rulesArea,
+				tr('queue rules', 'queue rules'),
+				this
+			),
+			makeTextSection(
+				tr('Current /opt/zapret2/config', 'Текущий /opt/zapret2/config'),
+				tr('Primary runtime configuration of zapret2 on the router.', 'Основной runtime-конфиг zapret2 на роутере.'),
+				this.configArea,
+				tr('zapret2 config', 'config zapret2'),
+				this
+			)
 		]);
 
 		this.applyData(data);
