@@ -110,10 +110,13 @@ if (!window.__zapret2PanelStylesInjected) {
 			word-break: break-word;
 		}
 		.z2-page .cbi-section {
-			margin: 0;
+			margin: 0 0 16px 0;
+		}
+		.z2-page .cbi-section:last-child {
+			margin-bottom: 0;
 		}
 		.z2-page .cbi-section-node {
-			padding: 14px 16px;
+			padding: 16px 18px;
 		}
 		.z2-actions {
 			display: grid;
@@ -149,6 +152,7 @@ if (!window.__zapret2PanelStylesInjected) {
 		.z2-section-title {
 			font-size: 15px;
 			font-weight: 700;
+			margin-bottom: 4px;
 		}
 		.z2-section-tools {
 			display: flex;
@@ -175,6 +179,10 @@ if (!window.__zapret2PanelStylesInjected) {
 			font-size: 12px;
 			opacity: .72;
 			margin-top: 8px;
+			line-height: 1.45;
+		}
+		.z2-section + .z2-section {
+			margin-top: 4px;
 		}
 	`));
 }
