@@ -111,12 +111,13 @@ if (!window.__zapret2PanelStylesInjected) {
 		}
 		.z2-page .cbi-section {
 			margin: 0 0 16px 0;
+			padding: 16px 18px;
 		}
 		.z2-page .cbi-section:last-child {
 			margin-bottom: 0;
 		}
 		.z2-page .cbi-section-node {
-			padding: 16px 18px;
+			padding: 0;
 		}
 		.z2-actions {
 			display: grid;
