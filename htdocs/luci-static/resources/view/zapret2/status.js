@@ -109,10 +109,34 @@ if (!window.__zapret2PanelStylesInjected) {
 			font-weight: 600;
 			word-break: break-word;
 		}
+		.z2-page .cbi-section {
+			margin: 0;
+		}
+		.z2-page .cbi-section-node {
+			padding: 14px 16px;
+		}
 		.z2-actions {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 8px;
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+			gap: 10px;
+			align-items: stretch;
+			margin: 10px 0 12px 0;
+		}
+		.z2-page .cbi-section-node.z2-actions {
+			padding: 4px 0;
+		}
+		.z2-actions .btn {
+			display: inline-flex !important;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			min-height: 42px;
+			margin: 0 !important;
+			padding: 10px 14px;
+			border-radius: 10px;
+			text-align: center;
+			white-space: normal;
+			line-height: 1.25;
 		}
 		.z2-section-header {
 			display: flex;
@@ -120,7 +144,7 @@ if (!window.__zapret2PanelStylesInjected) {
 			justify-content: space-between;
 			gap: 10px;
 			flex-wrap: wrap;
-			margin-bottom: 10px;
+			margin-bottom: 14px;
 		}
 		.z2-section-title {
 			font-size: 15px;
@@ -131,8 +155,12 @@ if (!window.__zapret2PanelStylesInjected) {
 			gap: 8px;
 			flex-wrap: wrap;
 		}
+		.z2-section-tools .btn {
+			margin: 0 !important;
+		}
 		.z2-textarea {
 			width: 100%;
+			box-sizing: border-box;
 			min-height: 220px;
 			font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 			font-size: 12px;
