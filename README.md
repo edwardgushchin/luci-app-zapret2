@@ -1,6 +1,8 @@
 # luci-app-zapret2
 
-Minimal LuCI panel for a **manually installed `zapret2`** on OpenWrt / GL.iNet routers.
+Minimal LuCI panel for the upstream **[`bol-van/zapret2`](https://github.com/bol-van/zapret2)** project on OpenWrt / GL.iNet routers.
+
+This repository provides a compact LuCI front-end for deployments based on **`zapret2`**. It does **not** replace or bundle the upstream project itself; it complements it with an operational web panel.
 
 Originally built and tested on:
 - **GL.iNet Flint 2 (GL-MT6000)**
@@ -40,9 +42,11 @@ The UI language is chosen automatically from the current LuCI page language (wit
 
 ## Important scope
 
-This package is **not** a full-featured upstream GUI for `zapret2`.
-It is a compact operational panel for setups where:
-- `zapret2` is already installed manually;
+This package is a **LuCI companion panel for the upstream `bol-van/zapret2` project**.
+It is **not** a full-featured upstream GUI for `zapret2`, and it does not attempt to replace the upstream runtime or its strategy tooling.
+
+It is meant for setups where:
+- upstream `zapret2` is already installed manually;
 - config lives in `/opt/zapret2/config`;
 - LuCI only needs status + basic control + visibility into the active runtime.
 

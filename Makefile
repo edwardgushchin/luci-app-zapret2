@@ -1,5 +1,5 @@
 #
-# Minimal LuCI panel for manually installed zapret2
+# Minimal LuCI panel for the upstream bol-van/zapret2 project
 #
 
 include $(TOPDIR)/rules.mk
@@ -10,12 +10,12 @@ PKG_RELEASE:=2
 PKG_LICENSE:=MIT
 PKG_MAINTAINER:=Eduard Gushchin
 
-LUCI_TITLE:=Minimal LuCI panel for manually installed zapret2
+LUCI_TITLE:=LuCI panel for the upstream bol-van/zapret2 project
 LUCI_DEPENDS:=+rpcd
 LUCI_PKGARCH:=all
 
 define Package/$(PKG_NAME)/description
- Minimal LuCI panel for a manually installed zapret2 runtime.
+ Minimal LuCI panel for the upstream bol-van/zapret2 project.
  Expects /etc/init.d/zapret2 and /opt/zapret2/config to exist.
 endef
 
